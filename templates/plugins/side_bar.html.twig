@@ -1,0 +1,212 @@
+{# <!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>Document</title>
+	</head>
+	<body id="body-pd" class="body-pd"> #}
+		<header class="header body-pd" id="header">
+			{% set currentRoute = app.request.attributes.get('_route') %}
+			<div class="header_toggle ">
+				<div class="d-flex align-items-center">
+					<i class="fa-solid fa-bars fa-xmark " id="header-toggle"></i>
+				</div>
+			</div>
+			<div class="profile mt-3">
+				<ul class="d-flex align-items-center">
+					<li style="margin-right:20px;" class="nav-item dropdown">
+						<button class="nav-link dropdown-toggle" id="navbarDropdown">
+							<i class="fas fa-user"></i>
+							{{ app.user.username }}
+
+						</button>
+						<div class="dropdown-content" id="divMenu">
+							<a class="" href="#" data-toggle="modal" data-target="#changePasswordModal">
+								<i class="fa-solid fa-pen-to-square"></i>
+								Mot de passe
+							</a>
+							<a class="" href="{{path('app_logout')}}">
+								<i class="fa-solid fa-right-from-bracket"></i>
+								Déconnexion</a>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</header>
+		<div class="l-navbar show-sidebar " id="nav-bar">
+			<nav class="nav ">
+				<div>
+					<a href="#" class="nav_logo">
+					<i class="fa-solid fa-cubes" style="color: orange;"></i>
+						<span class="nav_logo-name">G-STOCK</span>
+					</a>
+					<div class="nav_list menuList">
+						<ul>
+							{% if is_granted("ROLE_ADMIN") %}
+								<li>
+									<a href="#" class="nav_link menuLink d-flex sidebarMenu " id="1">
+										<i class="fas fa-users"></i>
+										<span class="nav_name">Gestion des Utilisateurs</span>
+										<span class="fas fa-caret-right"></span>
+									</a>
+									<ul class="nav_list sub-menu collapse" id="subModule1">
+									<li class="nav_link_sub nav_link">
+											<i class="fa fa-genderless"></i>
+											<a href="/users" class="subMenuItems">List utilisateurs</a>
+										</li>
+										<li class="nav_link_sub nav_link">
+											<i class="fa fa-genderless"></i>
+											<a href="/adduser" class="subMenuItems">Nouveau utilisateur</a>
+										</li>
+										
+									</ul>
+								</li>
+							
+
+							<li>
+								<a href="#" class="nav_link menuLink d-flex sidebarMenu " id="2">
+									<i class="fas fa-box-open"></i>
+									<span class="nav_name">Gestion de stock</span>
+									<span class="fas fa-caret-right"></span>
+								</a>
+								<ul class="nav_list sub-menu collapse" id="subModule2">
+								<li class="nav_link_sub nav_link">
+										<i class="fa fa-genderless"></i>
+										<a href="/produits" class="subMenuItems">List produits</a>
+									</li>
+									<li class="nav_link_sub nav_link">
+										<i class="fa fa-genderless"></i>
+										<a href="/addproduit" class="subMenuItems">Nouveau produit</a>
+									</li>
+									
+								</ul>
+							</li>
+							<li>
+								<a href="#" class="nav_link menuLink d-flex sidebarMenu " id="3">
+									<i class="fas fa-list"></i>
+									<span class="nav_name">Gestion des Categories</span>
+									<span class="fas fa-caret-right"></span>
+								</a>
+								<ul class="nav_list sub-menu collapse" id="subModule3">
+									<li class="nav_link_sub nav_link">
+										<i class="fa fa-genderless"></i>
+										<a href="/categories" class="subMenuItems">List categories</a>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<a href="#" class="nav_link menuLink d-flex sidebarMenu " id="4">
+									<i class="fas fa-money-bill"></i>
+									<span class="nav_name">Gestion des Paiements</span>
+									<span class="fas fa-caret-right"></span>
+								</a>
+								<ul class="nav_list sub-menu collapse" id="subModule4">
+									<li class="nav_link_sub nav_link">
+										<i class="fa fa-genderless"></i>
+										<a href="/paiements" class="subMenuItems">List Paiements</a>
+									</li>
+								</ul>
+							</li>
+							{% endif %}
+								<li>
+								<a href="#" class="nav_link menuLink d-flex sidebarMenu " id="5">
+									<i class="fas fa-shopping-cart"></i>
+									<span class="nav_name"> Gestion de vente </span>
+									<span class="fas fa-caret-right"></span>
+								</a>
+								<ul class="nav_list sub-menu collapse" id="subModule5">
+								<li class="nav_link_sub nav_link">
+										<i class="fa fa-genderless"></i>
+										<a href="/Ventecard" class="subMenuItems">vente</a>
+									</li>
+									<li class="nav_link_sub nav_link">
+										<i class="fa fa-genderless"></i>
+										<a href="/ventes" class="subMenuItems">Traitement Vente</a>
+									</li>
+									
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</nav>
+		</div>
+		<!-- Modale de changement de mot de passe -->
+		<div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="changePasswordModalLabel">Changer le mot de passe</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<form method="post" action="{{ path('app_changepassword') }}">
+							<div class="form-group">
+								<label for="new-password" class="col-form-label">Nouveau mot de passe :</label>
+								<input type="password" class="form-control" id="new-password" name="new-password" required>
+							</div>
+							<div class="form-group">
+								<label for="confirm-password" class="col-form-label">Confirmer le mot de passe :</label>
+								<input type="password" class="form-control" id="confirm-password" name="confirm-password" required>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+							<button type="submit" class="btn btn-primary">Enregistrer</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+		<script>
+			document.addEventListener("DOMContentLoaded", function (event) {
+const showNavbar = (toggleId, navId, bodyId, headerId) => {
+const toggle = document.getElementById(toggleId),
+nav = document.getElementById(navId),
+bodypd = document.getElementById(bodyId),
+headerpd = document.getElementById(headerId);
+
+if (toggle && nav && bodypd && headerpd) {
+toggle.addEventListener("click", () => {
+toggle.classList.toggle("toggle_margin")
+nav.classList.toggle("nav_width")
+nav.classList.toggle("show-sidebar");
+toggle.classList.toggle("fa-xmark");
+bodypd.classList.toggle("body-pd");
+headerpd.classList.toggle("body-pd");
+});
+}
+};
+showNavbar("header-toggle", "nav-bar", "body-pd", "header");
+
+$(".sidebarMenu").on("click", function () {
+$(".menuList:not(.nav_link_sub)").find(".active").removeClass("active");
+$(this).toggleClass("active");
+
+var idModule = $(this).attr("id");
+$(".sub-menu:not(#subModule" + idModule + ")").hide("3ms");
+$("#subModule" + idModule).toggle("5ms");
+$("#subModule" + idModule).toggleClass("showing");
+
+$(".fa-caret-right").removeClass("rotate")
+if (!$("#subModule" + idModule).hasClass("showing")) {
+$(this).find(".fa-caret-right").addClass("rotate")
+}
+$(this).find(".fa-caret-right").toggleClass("rotate")
+})
+
+$("#navbarDropdown").on("click", function () {
+$("#divMenu").toggle("5ms");
+})
+});
+		</script>
+	{# </body>
+</html> #}
+

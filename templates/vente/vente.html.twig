@@ -1,0 +1,127 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ventes{% endblock %}
+
+{% block body %}
+    <div class="card mt-5 shadow">
+        <div class="card-header text-dark">
+            <h1 class="mb-0">Produits Sélectionnés pour la Vente</h1>
+        </div>
+        <div class="card-body">
+            {% if produitsChoisis|length > 0 %}
+                <table class="table table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Nom du produit</th>
+                            <th>Quantité</th>
+                            <th>Prix Unitaire</th>
+                            <th>Sous-total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in produitsChoisis %}
+                            <tr>
+                                <td>{{ item.produit.getName() }}</td>
+                                <td>{{ item.quantite }}</td>
+                                <td>{{ item.produit.getPrix() }} DH</td>
+                                <td>{{ item.subtotal }} DH</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <p class="font-weight-bold">Total: {{ total }} DH</p>
+
+                <form method="post" action="{{ path('valider_vente', { 'total': total }) }}">
+                    <div class="form-group">
+                        <label for="paiement" class="font-weight-bold">Mode de Paiement</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-credit-card"></i></span>
+                            </div>
+                            <select id="paiement" name="paiement" class="form-control" onchange="togglePaymentFields()">
+                                <option value="">Sélectionner</option>
+                                {% for paiement in paiements %}
+                                    <option value="{{ paiement.id }}">{{ paiement.methode }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="cashPaymentFields" style="display: none;">
+                        <div class="form-group">
+                            <label for="cache" class="font-weight-bold">Montant Payé en Espèces</label>
+                            <input type="number" id="cache" name="cache" class="form-control" value="{{ total }}" oninput="calculateChange()">
+                        </div>
+                        <div class="form-group">
+                            <label for="change" class="font-weight-bold">Reste à Rendre</label>
+                            <input type="text" id="change" class="form-control" readonly>
+                        </div>
+                    </div>
+                    
+                    <div id="cardPaymentFields" style="display: none;">
+                        <div class="form-group">
+                            <label for="numcartbancaire" class="font-weight-bold">Numéro de Carte Bancaire</label>
+                            <input type="text" id="numcartbancaire" name="numcartbancaire" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="date_experation" class="font-weight-bold">Date d'Expiration</label>
+                            <input type="date" id="date_experation" name="date_experation" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="cache_card" class="font-weight-bold">Montant Payé par Carte</label>
+                            <input type="number" id="cache_card" name="cache_card" class="form-control" value="{{ total }}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="datePaie" class="font-weight-bold">Date de Paiement</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                            </div>
+                            <input type="date" id="datePaie" name="datePaie" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary font-weight-bold">Valider la Vente</button>
+                </form>
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    Aucun produit sélectionné.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function togglePaymentFields() {
+            var paiementMethod = document.getElementById('paiement').value;
+            var cashFields = document.getElementById('cashPaymentFields');
+            var cardFields = document.getElementById('cardPaymentFields');
+            
+            if (paiementMethod === '1') { // Assuming '1' is the ID for cash payment
+                cashFields.style.display = 'block';
+                cardFields.style.display = 'none';
+            } else if (paiementMethod === '2') { // Assuming '2' is the ID for card payment
+                cashFields.style.display = 'none';
+                cardFields.style.display = 'block';
+            } else {
+                cashFields.style.display = 'none';
+                cardFields.style.display = 'none';
+            }
+        }
+
+        function calculateChange() {
+            var total = {{ total }};
+            var paidAmount = parseFloat(document.getElementById('cache').value);
+            var change = paidAmount - total;
+            document.getElementById('change').value = change.toFixed(2) + ' DH';
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            var datePaieInput = document.getElementById('datePaie');
+            var today = new Date().toISOString().split('T')[0];
+            datePaieInput.value = today;
+        });
+    </script>
+{% endblock %}

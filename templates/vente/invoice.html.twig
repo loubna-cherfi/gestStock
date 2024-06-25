@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Invoice Receipt</title>
+		<link rel="icon" type="image/png" href="{{ asset('/pictures/icon.svg') }}">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-... your integrity hash ..." crossorigin="anonymous"/>
+		<style>
+			body {
+				background: #eee;
+			}
+			.text-danger strong {
+				color: #9f181c;
+			}
+			.receipt-main {
+				background: #ffffff none repeat scroll 0 0;
+				border-bottom: 12px solid #333333;
+				border-top: 12px solid #3c87b9;
+				margin-top: 50px;
+				margin-bottom: 50px;
+				padding: 40px 30px !important;
+				position: relative;
+				box-shadow: 0 1px 21px #acacac;
+				color: #333333;
+				font-family: open sans;
+			}
+			.receipt-main p {
+				color: #333333;
+				font-family: open sans;
+				line-height: 1.42857;
+			}
+			.receipt-footer h1 {
+				font-size: 17px;
+				font-weight: 400 !important;
+				margin: 0 !important;
+			}
+			.receipt-main::after {
+				background: #414143 none repeat scroll 0 0;
+				content: "";
+				height: 5px;
+				left: 0;
+				position: absolute;
+				right: 0;
+				top: -13px;
+			}
+			.receipt-main thead {
+				background: #414143 none repeat scroll 0 0;
+			}
+			.receipt-main thead th {
+				color: #fff;
+			}
+			.receipt-right h5 {
+				font-size: 16px;
+				font-weight: bold;
+				margin: 0 0 7px;
+			}
+			.receipt-right p {
+				font-size: 13px;
+				margin: 0;
+			}
+			.receipt-right p i {
+				text-align: center;
+				width: 18px;
+			}
+			.receipt-main td {
+				padding: 9px 20px !important;
+			}
+			.receipt-main th {
+				padding: 13px 20px !important;
+			}
+			.receipt-main td {
+				font-size: 16px;
+				font-weight: initial !important;
+			}
+			.receipt-main td p:last-child {
+				margin: 0;
+				padding: 0;
+			}
+			.receipt-main td h2 {
+				font-size: 20px;
+				font-weight: 900;
+				margin: 0;
+				text-transform: uppercase;
+			}
+			.receipt-header-mid .receipt-left h1 {
+				font-weight: 100;
+				margin: 34px 0 0;
+				text-align: right;
+				text-transform: uppercase;
+			}
+			.receipt-header-mid {
+				margin: 20px 0;
+				overflow: hidden;
+			}
+			#container {
+				background-color: #dcdcdc;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="col-md-12">
+			<div class="row">
+				<div class="receipt-main col-xs-10 col-sm-10 col-md-6 col-xs-offset-1 col-sm-offset-1 col-md-offset-3 row">
+					<div class="col-md-5">
+						<div class="receipt-header row">
+							<div
+								class="col-xs-6 col-sm-6 col-md-6">{# <div class="receipt-left" style="margin-left: 5%">
+																		                            <img class="img-responsive" alt="" src="" style="width: 80px; border-radius: 43px;">
+																		                        </div> #}
+							</div>
+							<div class="col-xs-6 col-sm-6 col-md-6" style="margin-left: 70% ;margin-top: -70px">
+								<div class="receipt-right">
+									<h5>G-stock</h5>
+									<p>+1 3649-6589
+										<i class="fa fa-phone"></i>
+									</p>
+									<p>G-stock@gmail.com
+										<i class="fa fa-envelope-o"></i>
+									</p>
+									<p>Morocco
+										<i class="fa fa-location-arrow"></i>
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-5">
+						<div class="receipt-header receipt-header-mid row">
+							<div class="col-xs-8 col-sm-8 col-md-8">
+								<div class="receipt-right">
+									<div class="receipt-right">
+										<p>
+											<b>
+												<i class="fa fa-user"></i>
+												Client:</b>
+											{{ app.user.username }}</p>
+										<p>
+											<b>
+												<i class="fa fa-mobile"></i>
+												Mobile:</b>
+											{{ app.user.mobile }}</p>
+										<p>
+											<b>
+												<i class="fa fa-envelope"></i>
+												Email:</b>
+											{{ app.user.email }}</p>
+										<p>
+											<b>
+												<i class="fa fa-map-marker"></i>
+												Address:</b>
+											{{ app.user.adress }}</p>
+									</div>
+
+								</div>
+							</div>
+							<div class="col-xs-4 col-sm-4 col-md-4" style="margin-left: 25%">
+								<div class="receipt-left">
+									<p><b>Facture</b>
+                                    {{ vente.id }}</p>
+								</div>
+
+							</div>
+						</div>
+					</div>
+					<div class="offset-6" style="margin-left: 5%">
+						<table class="table table-bordered">
+							<thead>
+								<tr>
+									<th>Produit</th>
+									<th>Prix unitaire</th>
+									<th>Quantité</th>
+                                    <th>Payment Method</th>
+									<th>Sous-total</th>
+
+								</tr>
+							</thead>
+							<tbody>
+								{% for item in produitsChoisis %}
+									<tr>
+										<td>{{ item.produit.name }}</td>
+										<td>{{ item.prix }}</td>
+										<td>{{ item.quantite }}</td>
+                                       <td> {{ paymentMethod }}</td>
+										<td>{{ item.subtotal }}</td>
+									</tr>
+								{% endfor %}
+								
+								 <tr>
+                    <td class="offset-4"></td>
+                        <td class="offset-4"></td>
+                        <td class="text-right"><h2><strong>Total: </strong></h2></td>
+                        <td class="text-left text-danger"><h2><strong><i class="fa fa-inr"></i>{{ total }} DH</strong></h2></td>
+                    </tr>
+                                {% if paymentMethod == 'cashe' %}
+									<tr>
+										<td colspan="3" class="text-right">
+											<strong>Amount Paid:</strong>
+										</td>
+										<td class="text-left text-success">
+											<strong>
+												<i class="fa fa-inr"></i>
+												{{ montantPaye }}
+												MAD</strong>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="3" class="text-right">
+											<strong>Remaining Balance:</strong>
+										</td>
+										<td class="text-left text-warning">
+											<strong>
+												<i class="fa fa-inr"></i>
+												{{ total - montantPaye }}
+												MAD</strong>
+										</td>
+									</tr>
+								{% endif %}
+							</tbody>
+						</table>
+					</div>
+					<div class="row">
+						<div class="receipt-header receipt-header-mid receipt-footer">
+							<div class="col-xs-8 col-sm-8 col-md-8 text-left">
+								<div class="receipt-right">
+                                  
+									<p>
+										<b>Date :</b>
+										{{ vente.dateVente|date('Y-m-d') }}</p>
+									<br>
+									<br>
+									<h5 style="color: rgb(140, 140, 140);">Merci pour vos achats.!</h5>
+								</div>
+							</div>
+							<div class="col-xs-4 col-sm-4 col-md-4">
+								<div class="receipt-left">
+									<h1>G-stock</h1>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="receipt-footer" style="margin-left: 20%">
+			<h1 class="text-secondary offset-2" style="font-size: 12px">Tous droits réservés, toute activité illégale peut entraîner de graves conséquences</h1>
+
+		</div>
+	</body>
+</html>
+

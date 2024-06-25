@@ -1,0 +1,207 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	<div class="container mt-4 shadow">
+		<h1 style="margin-top:100px;">Produits</h1>
+		<table id="produit-table" class="table table-striped table-bordered">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Nom</th>
+					<th>Prix</th>
+					<th>Date d'entrée</th>
+					<th>Date d'expiration</th>
+					<th>Catégorie</th>
+                    <th>Quantite</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+
+	<!-- Modal pour modifier les produits -->
+	<div class="modal fade" id="modifierproduit" tabindex="-1" role="dialog" aria-labelledby="changeProduitModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="changeProduitModalLabel">Modifier Produit</h5>
+					<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form method="post" id="edit-produit-form" action="#">
+						<div class="form-group">
+							<label for="edit-name" class="col-form-label">Nom:</label>
+							<input type="text" class="form-control" id="edit-name" name="name">
+						</div>
+						<div class="form-group">
+							<label for="edit-prix" class="col-form-label">Prix:</label>
+							<input type="number" step="0.01" class="form-control" id="edit-prix" name="prix">
+						</div>
+						<div class="form-group">
+							<label for="edit-date-entreer" class="col-form-label">Date d'entrée:</label>
+							<input type="datetime-local" class="form-control" id="edit-date-entreer" name="dateEntreer">
+						</div>
+						<div class="form-group">
+							<label for="edit-date-expiration" class="col-form-label">Date d'expiration:</label>
+							<input type="datetime-local" class="form-control" id="edit-date-expiration" name="dateExpiration">
+						</div>
+						<div class="form-group">
+							<label for="edit-quantite" class="col-form-label">Quantité:</label>
+							<input type="number" class="form-control" id="edit-quantite" name="quantite">
+						</div>
+						<div class="form-group">
+							<label for="edit-categorie" class="col-form-label">Catégorie:</label>
+							<select name="categorie" id="edit-categorie" class="form-control">
+								<option value="" disabled>Choisir une catégorie</option>
+								{% for categorie in categories %}
+									<option value="{{ categorie.id }}">{{ categorie.name }}</option>
+								{% endfor %}
+							</select>
+						</div>
+						<input type="hidden" name="user" value="{{ app.user.id }}">
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+					<button type="submit" class="btn btn-primary" form="edit-produit-form">Enregistrer</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- jQuery (version complète) -->
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+	<!-- Bootstrap 5 CSS -->
+	{# <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"> #}
+
+	<!-- DataTables CSS -->
+	<link
+	href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css" rel="stylesheet"> <!-- DataTables JS -->
+	<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/bs5/1.10.25/js/dataTables.bootstrap5.min.js"></script>
+
+	<!-- Axios (si nécessaire) -->
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	<script>
+		$(document).ready(function () {
+$('#produit-table').DataTable({
+processing: true,
+serverSide: true,
+ajax: {
+url: '{{ path('produits_datatables') }}',
+type: 'GET',
+dataType: 'json'
+},
+columns: [
+{
+data: 'id'
+},
+{
+data: 'name'
+},
+{
+data: 'prix'
+},
+{
+data: 'dateEntreer'
+}, {
+data: 'dateExpiration'
+}, {
+data: 'categorie'
+}, {
+data: 'quantite'
+}, { // Ajouter la colonne quantité
+data: null,
+render: function (data) {
+return '<button class="btn btn-outline btn-edit" style="background-color:#FF8C00;" data-id="' + data.id + '"><i class="fas fa-edit"></i></button>';
+}
+}
+],
+language: {
+lengthMenu: "Afficher _MENU_ enregistrements par page",
+zeroRecords: "Aucun enregistrement trouvé",
+info: "Affichage de la page _PAGE_ sur _PAGES_",
+infoEmpty: "Aucun enregistrement disponible",
+infoFiltered: "(filtré à partir de _MAX_ enregistrements au total)",
+search: "Rechercher:",
+paginate: {
+first: "Premier",
+last: "Dernier",
+next: "Suivant",
+previous: "Précédent"
+}
+},
+dom: '<"row mb-3"<"col-md-6 d-flex align-items-center"l><"col-md-6 d-flex align-items-center justify-content-end"f>>' + '<"row"<"col-md-12"tr>>' + '<"row mt-3"<"col-md-5 d-flex align-items-center"i><"col-md-7 d-flex align-items-center justify-content-end"p>>'
+});
+
+$('#produit-table').on('click', '.btn-edit', function () {
+var produitId = $(this).data('id');
+axios.get('/produits/get/' + produitId).then(function (response) {
+$('#edit-name').val(response.data.name);
+$('#edit-prix').val(response.data.prix);
+$('#edit-date-entreer').val(response.data.dateEntreer);
+$('#edit-date-expiration').val(response.data.dateExpiration);
+$('#edit-categorie').val(response.data.categorie);
+$('#edit-quantite').val(response.data.quantite); // Pré-remplir la quantité
+
+$('#edit-produit-form').attr('action', '/produits/' + produitId);
+$('#modifierproduit').modal('show');
+}).catch(function (error) {
+console.log(error);
+});
+});
+});
+	</script>
+
+	<style>
+		.dataTables_wrapper .dataTables_paginate .paginate_button {
+			padding: 0.5rem 1rem;
+			margin-left: 0.5rem;
+			border-radius: 0.25rem;
+			background-color: #6c757d;
+			color: white;
+		}
+		{
+			# .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+				background-color: #90EE90;
+				color: #000000;
+			} #
+		}
+		.dataTables_wrapper .dataTables_filter input {
+			width: auto;
+			display: inline-block;
+			margin-left: 0.5rem;
+			border-radius: 0.25rem;
+			border: 1px solid #ced4da;
+			padding: 0.375rem 0.75rem;
+		}
+		.dataTables_wrapper .dataTables_length select {
+			width: auto;
+			display: inline-block;
+			margin-right: 0.5rem;
+			border-radius: 0.25rem;
+			border: 1px solid #ced4da;
+			padding: 0.375rem 0.75rem;
+		}
+	</style>
+
+	{% if app.session.flashbag.has('error') %}
+	<script>
+		Swal.fire({
+			title: 'Erreur',
+			icon: 'error',
+			html: '{{ app.session.flashbag.get('error')[0] }}',
+			showCloseButton: true,
+			showCancelButton: false,
+			focusConfirm: false,
+			confirmButtonColor: '#d33',
+			confirmButtonText: 'OK'
+		});
+	</script>
+	{% endif %}
+
+{% endblock %}

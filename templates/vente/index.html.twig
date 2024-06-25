@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Vente{% endblock %}
+
+{% block body %}
+    <div class="card shadow" style="margin-top:100px;">
+        <div class="card-header">
+            <h1>Produits</h1>
+        </div>
+        <div class="card-body">
+            <blockquote class="blockquote mb-0">
+                <form method="get" action="{{ path('ventes_cards') }}" id="search-form" class="d-flex justify-content-end mb-4">
+                    <div class="form-group">
+                        <input type="text" name="search" class="form-control form-control-sm" id="search-input" placeholder="Rechercher un produit" style="width: 200px;">
+                    </div>
+                </form>
+                <div class="row mt-4" id="products-list">
+                    {% for produit in produits %}
+                        {% if produit.quantite > 0 %}
+                            <div class="col-md-4">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ produit.name }}</h5>
+                                        <p class="card-text">
+                                            Prix: {{ produit.prix }}<br>
+                                            Quantité en stock: {{ produit.quantite }}
+                                        </p>
+                                        <form method="post" action="{{ path('produit_choisir', { 'id': produit.id }) }}">
+                                            <button type="submit" class="btn btn-primary">Choisir</button>
+                                        </form>
+                                        {% if produitsSession[produit.id] is defined %}
+                                            <p>Quantité choisie: {{ produitsSession[produit.id]['quantite'] }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </blockquote>
+        </div>
+    </div>
+	<script>
+	document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('search-input');
+    const productsList = document.getElementById('products-list');
+
+    searchInput.addEventListener('input', function () {
+        const query = searchInput.value;
+
+        if (query.length > 0) {
+            fetch (`{{ path('produits_recherche') }}?search=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    productsList.innerHTML = '';
+                    data.forEach(produit => {
+                        if (produit.quantite > 0) {
+                            const productCard = `
+                                <div class="col-md-4">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${produit.name}</h5>
+                                            <p class="card-text">
+                                                Prix: ${produit.prix}<br>
+                                                Quantité en stock: ${produit.quantite}
+                                            </p>
+                                            <form method="post" action="/produits/choisir/${produit.id}">
+                                                <button type="submit" class="btn btn-primary">Choisir</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            productsList.insertAdjacentHTML('beforeend', productCard);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching search results:', error);
+                });
+        } else { // Fetch all products if the search query is empty
+            fetch(`{{ path('produits_tous') }}`)
+                .then(response => response.json())
+                .then(data => {
+                    productsList.innerHTML = '';
+
+                    data.forEach(produit => {
+                        if (produit.quantite > 0) {
+                            const productCard = `
+                                <div class="col-md-4">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${produit.name}</h5>
+                                            <p class="card-text">
+                                                Prix: ${produit.prix}<br>
+                                                Quantité en stock: ${produit.quantite}
+                                            </p>
+                                            <form method="post" action="/produits/choisir/${produit.id}">
+                                                <button type="submit" class="btn btn-primary">Choisir</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            productsList.insertAdjacentHTML('beforeend', productCard);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching all products:', error);
+                });
+        }
+    });
+});
+	</script>
+{% endblock %}

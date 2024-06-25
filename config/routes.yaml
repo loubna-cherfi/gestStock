@@ -1,0 +1,11 @@
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute
+change_password:
+    path: /changepassword
+    controller: App\Controller\ChangepasswordController::index
+users:
+    path: /users
+    controller: App\Controller\UserController::index

@@ -1,0 +1,102 @@
+
+	{% extends 'base.html.twig' %}
+    {% block title %}Ajouter un produit{% endblock %}
+
+	{% block body %}
+	<section class="gradient-custom">
+	    <div class="container py-5 h-100">
+	        <div class="row d-flex justify-content-center align-items-center h-100">
+	            <div class="col-md-10 col-lg-8 col-xl-7">
+	                <div class="card text-dark" style="border-radius: 1rem; background-color: #DCDCDC;">
+	                    <div
+<div class="card-body p-5 text-center">
+    <div class="mb-md-5 mt-md-4 pb-5">
+        <h2 class="fw-bold mb-2 text-uppercase">Ajouter un produit</h2>
+        {% if app.session.flashbag.has('error') %}
+            <script>
+                Swal.fire({
+                    title: 'Erreur',
+                    icon: 'error',
+                    html: '{{ app.session.flashbag.get('error')[0] }}',
+                    showCloseButton: true,
+                    showCancelButton: false,
+                    focusConfirm: false,
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK'
+                });
+            </script>
+        {% endif %}
+        <form action="{{ path('produit_add_form') }}" method="post" id="add-produit-form">
+            <div data-mdb-input-init class="form-outline form-white mb-4">
+                <input type="text" name="name" id="name" class="form-control form-control-lg" required placeholder="Nom du produit"/>
+            </div>
+            <div data-mdb-input-init class="form-outline form-white mb-4">
+                <input type="number" step="0.01" name="prix" id="prix" class="form-control form-control-lg" required placeholder="Prix"/>
+            </div>
+            <div data-mdb-input-init class="form-outline form-white mb-4">
+                <input type="number" name="quantite" id="quantite" class="form-control form-control-lg" required placeholder="Quantité"/>
+            </div>
+            <div data-mdb-input-init class="form-outline form-white mb-4">
+                <input type="datetime-local" name="dateEntreer" id="dateEntreer" class="form-control form-control-lg" required placeholder="Date d'entrée"/>
+            </div>
+            <button type="button" id="toggleExpirationButton" class="btn btn-secondary mb-4">Ajouter une date d'expiration</button>
+            <div data-mdb-input-init class="form-outline form-white mb-4" id="expirationField" style="display: none;">
+                <input type="datetime-local" name="dateExpiration" id="dateExpiration" class="form-control form-control-lg" placeholder="Date d'expiration"/>
+            </div>
+            <div data-mdb-input-init class="form-outline form-white mb-4">
+                <select name="categorie" id="categorie" class="form-control form-control-lg" required>
+                    <option value="" disabled selected>Choisir une catégorie</option>
+                    {% for categorie in categories %}
+                        <option value="{{ categorie.id }}">{{ categorie.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+             <div data-mdb-input-init class="form-outline form-white mb-4">
+        <input type="file" name="image" id="image" class="form-control form-control-lg" required accept="image/*"/>
+    </div>
+            <input type="hidden" name="user" value="{{ app.user.id }}">
+            <button data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-dark btn-lg px-5" type="submit">Ajouter</button>
+        </form>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                function checkExpirationDateRequired() {
+                    var selectedCategorie = document.getElementById('categorie').value;
+                    var dateExpirationField = document.getElementById('dateExpiration');
+                    var expirationField = document.getElementById('expirationField');
+                    var categoriesRequiringExpiration = ['1', '2']; // Replace with category IDs requiring expiration date
+
+                    if (categoriesRequiringExpiration.includes(selectedCategorie)) {
+                        dateExpirationField.setAttribute('required', 'required');
+                        expirationField.style.display = 'block';
+                    } else {
+                        dateExpirationField.removeAttribute('required');
+                        expirationField.style.display = 'none';
+                        dateExpirationField.value = ''; // Clear the field if hidden
+                    }
+                }
+
+                document.getElementById('categorie').addEventListener('change', checkExpirationDateRequired);
+                checkExpirationDateRequired();
+
+                document.getElementById('toggleExpirationButton').addEventListener('click', function() {
+                    var expirationField = document.getElementById('expirationField');
+                    if (expirationField.style.display === 'none') {
+                        expirationField.style.display = 'block';
+                        document.getElementById('dateExpiration').setAttribute('required', 'required');
+                    } else {
+                        expirationField.style.display = 'none';
+                        document.getElementById('dateExpiration').removeAttribute('required');
+                        document.getElementById('dateExpiration').value = ''; // Clear the field if hidden
+                    }
+                });
+            });
+        </script>
+    </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+{% endblock %}
