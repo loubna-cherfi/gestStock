@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Categorie;
 use App\Entity\Produit;
-use App\Entity\User;
 use App\Repository\CategorieRepository;
 use App\Repository\ProduitRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,10 +19,12 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class ProduitController extends AbstractController
 {
     private $entityManager;
+    private $slugger;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, SluggerInterface $slugger)
     {
         $this->entityManager = $entityManager;
+        $this->slugger = $slugger;
     }
 
     #[Route('/produits', name: 'produits', methods: ['GET'])]
@@ -37,6 +38,7 @@ class ProduitController extends AbstractController
             'categories' => $categories,
         ]);
     }
+    
     #[Route('/produits/datatables', name: 'produits_datatables', methods: ['GET'])]
     public function datatables(Request $request, ProduitRepository $produitRepository): JsonResponse
     {
@@ -99,54 +101,103 @@ class ProduitController extends AbstractController
     {
         if ($request->isMethod('POST')) {
             $produit = new Produit();
-            // Récupération des autres champs
             $produit->setName($request->request->get('name'));
             $produit->setPrix($request->request->get('prix'));
             $produit->setQuantite($request->request->get('quantite'));
     
             // Gestion de l'image
-            $imageFile = $request->files->get('image');
-            if ($imageFile) {
-                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+            $file = $request->files->get('image', '');
+            if($file){
+                
+                $fileName = md5(uniqid()) . '.' . $file->guessExtension();
+            $produit ->setImage($fileName);
+            $file->move(
+                $this->getParameter('image_directory'),
+                $fileName
+            );
+            }
+
+            // if ($imageFile) {
+            //     $imageFile->move(
+            //         $this->getParameter('pictures_directory'),$imageFile
+            //     );
+            //     $produit->setImage($imageFile);
+
+
+                // $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // $safeFilename = $slugger->slug($originalFilename);
+
+                // $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                // dd($safeFilename);
     
-                // Move the file to the directory where images are stored
-                try {
-                    $imageFile->move(
-                        $this->getParameter('pictures_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    // Handle exception if file cannot be moved
-                    $this->addFlash('error', 'An error occurred while uploading the image.');
-                    return $this->redirectToRoute('produit_add_form');
-                }
+                // Déplacement du fichier vers le répertoire où les images sont stockées
+                // try {
+                //     $imageFile->move(
+                //         $this->getParameter('pictures_directory'),
+                //         $newFilename
+                //     );
+                // } catch (FileException $e) {
+                //     // Gestion de l'exception si le fichier ne peut pas être déplacé
+                //     $this->addFlash('error', 'Une erreur est survenue lors du téléchargement de l\'image.');
+                //     return $this->redirectToRoute('produit_add_form');
+                // }
+                // $produit->setImage($newFilename); // Sauvegarder le nom du fichier dans l'entité
+            // }
     
-                $produit->setImage($newFilename); // Sauvegarder le nom du fichier dans l'entité
+            $dateEntreer = new \DateTime($request->request->get('dateEntreer'));
+            $produit->setDateEntreer($dateEntreer);
+    
+            $dateExpiration = $request->request->get('dateExpiration');
+            if ($dateExpiration != null) {
+                $dateExpirationObj = new \DateTime($dateExpiration);
+                $produit->setDateExpiration($dateExpirationObj);
             }
     
-            // Enregistrement du produit
+            $categorieId = $request->request->get('categorie');
+            $categorie = $categorieRepository->find($categorieId);
+            $produit->setCategorie($categorie);
+    
+            $user = $this->getUser();
+            $produit->setUser($user);
+    
             $this->entityManager->persist($produit);
             $this->entityManager->flush();
     
             return $this->redirectToRoute('produits');
         }
     
-        // Rendu du formulaire
         $categories = $categorieRepository->findAll();
         return $this->render('produit/ajouter.html.twig', [
             'categories' => $categories,
         ]);
-    }
+    } 
     #[Route('/produits/{id}', name: 'produit_edit', methods: ['GET', 'POST'])]
-    public function editProduit(Request $request, Produit $produit): Response
+    public function editProduit(Request $request, Produit $produit, CategorieRepository $categorieRepository): Response
     {
         if ($request->isMethod('POST')) {
             $produit->setName($request->request->get('name'));
             $produit->setPrix($request->request->get('prix'));
             $produit->setQuantite($request->request->get('quantite'));
-            $produit->setImage($request->request->get('image'));
+
+            $imageFile = $request->files->get('image');
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $this->slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+                try {
+                    $imageFile->move(
+                        $this->getParameter('pictures_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Une erreur est survenue lors du téléchargement de l\'image.');
+                    return $this->redirectToRoute('produit_edit', ['id' => $produit->getId()]);
+                }
+
+                $produit->setImage($newFilename);
+            }
+    
             $produit->setDateEntreer(new \DateTime($request->request->get('dateEntreer')));
 
             $dateExpiration = $request->request->get('dateExpiration');
@@ -160,40 +211,21 @@ class ProduitController extends AbstractController
                 $produit->setDateExpiration($dateExpirationObj);
             }
 
-            $categorie = $request->request->get('categorie');
+            $categorieId = $request->request->get('categorie');
+            $categorie = $categorieRepository->find($categorieId);
             if ($categorie) {
-                $categorieEntity = $this->entityManager->getRepository(Categorie::class)->find($categorie);
-                $produit->setCategorie($categorieEntity);
-            }
-
-            $user = $request->request->get('user');
-            if ($user) {
-                $userEntity = $this->entityManager->getRepository(User::class)->find($user);
-                $produit->setUser($userEntity);
+                $produit->setCategorie($categorie);
             }
 
             $this->entityManager->flush();
+            $this->addFlash('success', 'Le produit a été mis à jour avec succès.');
             return $this->redirectToRoute('produits');
         }
 
+        $categories = $categorieRepository->findAll();
         return $this->render('produit/edit.html.twig', [
             'produit' => $produit,
-        ]);
-    }
-
-    #[Route('/produits/get/{id}', name: 'produit_get', methods: ['GET'])]
-    public function getProduitById(Produit $produit): JsonResponse
-    {
-        return new JsonResponse([
-            'id' => $produit->getId(),
-            'name' => $produit->getName(),
-            'prix' => $produit->getPrix(),
-            'quantite' => $produit->getQuantite(),
-            'image' => $produit->getImage(),
-            'dateEntreer' => $produit->getDateEntreer()->format('Y-m-d H:i:s'),
-            'dateExpiration' => $produit->getDateExpiration() ? $produit->getDateExpiration()->format('Y-m-d H:i:s') : null,
-            'categorie' => $produit->getCategorie() ? $produit->getCategorie()->getName() : null,
-            'user' => $produit->getUser() ? $produit->getUser()->getUsername() : null,
+            'categories' => $categories,
         ]);
     }
 }

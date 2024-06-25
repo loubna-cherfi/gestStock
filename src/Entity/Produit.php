@@ -22,7 +22,7 @@ class Produit
     #[ORM\Column]
     private ?float $prix = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE,nullable:true)]
     private ?\DateTimeInterface $dateEntreer = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE,nullable:true)]
@@ -43,8 +43,8 @@ class Produit
     #[ORM\Column]
     private ?int $quantite = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $image = null;
+    #[ORM\Column(length: 255,nullable:true)]
+    private ?string $image =null;
 
     public function __construct()
     {

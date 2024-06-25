@@ -23,6 +23,7 @@
                                         <h5 class="card-title">{{ produit.name }}</h5>
                                         <p class="card-text">
                                             Prix: {{ produit.prix }}<br>
+                                            {{ produit.image }}
                                             Quantité en stock: {{ produit.quantite }}
                                         </p>
                                         <form method="post" action="{{ path('produit_choisir', { 'id': produit.id }) }}">
