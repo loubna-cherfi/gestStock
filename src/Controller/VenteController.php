@@ -43,7 +43,7 @@ class VenteController extends AbstractController
     {
         $search = $request->query->get('search', '');
         $produits = $produitRepository->findByName($search);
-
+    
         $data = [];
         foreach ($produits as $produit) {
             $data[] = [
@@ -51,17 +51,18 @@ class VenteController extends AbstractController
                 'name' => $produit->getName(),
                 'prix' => $produit->getPrix(),
                 'quantite' => $produit->getQuantite(),
+                'image' => $produit->getImage(), // Assurez-vous que getImage() retourne le chemin de l'image correct
             ];
         }
-
+    
         return new JsonResponse($data);
     }
-
     #[Route('/produits/tous', name: 'produits_tous', methods: ['GET'])]
+
     public function tousProduits(ProduitRepository $produitRepository): JsonResponse
     {
         $produits = $produitRepository->findAll();
-
+    
         $data = [];
         foreach ($produits as $produit) {
             $data[] = [
@@ -69,11 +70,14 @@ class VenteController extends AbstractController
                 'name' => $produit->getName(),
                 'prix' => $produit->getPrix(),
                 'quantite' => $produit->getQuantite(),
+                'image' => $produit->getImage(), // Assurez-vous que getImage() retourne le chemin de l'image correct
             ];
         }
-
+    
         return new JsonResponse($data);
     }
+    
+  
 
     #[Route('/produits/choisir/{id}', name: 'produit_choisir', methods: ['POST'])]
     public function choisirProduit(Request $request, Produit $produit): Response

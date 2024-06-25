@@ -8,11 +8,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class TestController extends AbstractController
 {
-    #[Route('/test', name: 'app_test')]
+    #[Route('/', name: 'app_test', methods: ['GET', 'POST'])]
     public function index(): Response
     {
-        return $this->render('/dashboard.html.twig', [
-            'controller_name' => 'TestController',
-        ]);
+        return $this->render('/dashboard.html.twig');
     }
 }

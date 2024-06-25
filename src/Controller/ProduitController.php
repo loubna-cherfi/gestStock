@@ -112,7 +112,7 @@ class ProduitController extends AbstractController
                 $fileName = md5(uniqid()) . '.' . $file->guessExtension();
             $produit ->setImage($fileName);
             $file->move(
-                $this->getParameter('image_directory'),
+                $this->getParameter('pictures_directory'),
                 $fileName
             );
             }
@@ -197,7 +197,7 @@ class ProduitController extends AbstractController
 
                 $produit->setImage($newFilename);
             }
-    
+
             $produit->setDateEntreer(new \DateTime($request->request->get('dateEntreer')));
 
             $dateExpiration = $request->request->get('dateExpiration');
@@ -228,4 +228,26 @@ class ProduitController extends AbstractController
             'categories' => $categories,
         ]);
     }
+    #[Route('/produits/get/{id}', name: 'produit_get', methods: ['GET'])]
+public function getProduit(int $id, ProduitRepository $produitRepository): JsonResponse
+{
+    $produit = $produitRepository->find($id);
+
+    if (!$produit) {
+        return new JsonResponse(['error' => 'Produit not found'], 404);
+    }
+
+    $data = [
+        'id' => $produit->getId(),
+        'name' => $produit->getName(),
+        'prix' => $produit->getPrix(),
+        'dateEntreer' => $produit->getDateEntreer()->format('Y-m-d'),
+        'dateExpiration' => $produit->getDateExpiration() ? $produit->getDateExpiration()->format('Y-m-d') : null,
+        'categorie' => $produit->getCategorie()->getId(),
+        'quantite' => $produit->getQuantite(),
+        'image' => $produit->getImage(),
+    ];
+
+    return new JsonResponse($data);
+}
 }
