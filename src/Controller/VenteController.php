@@ -171,11 +171,11 @@ class VenteController extends AbstractController
         $paiementUser->setDatePaie($datePaie);
     
         $montantPaye = 0;
-        if ($paiement->getMethode() === 'cash') {
+        if ($paiement->getMethode() === 'Espece') {
             $cache = $request->request->get('cache');
             $paiementUser->setCache($cache);
             $montantPaye = $cache;
-        } elseif ($paiement->getMethode() === 'carte bancaire') {
+        } elseif ($paiement->getMethode() === 'Carte Bancaire') {
             $numCarteBancaire = $request->request->get('numcartbancaire');
             $dateExpiration = $request->request->get('date_experation');
             $montantCarte = $request->request->get('cache_card');

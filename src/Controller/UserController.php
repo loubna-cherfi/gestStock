@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
-
+#[Route('/admin' )]
 class UserController extends AbstractController
 {
     private $entityManager;
@@ -21,7 +21,8 @@ class UserController extends AbstractController
     {
         $this->entityManager = $entityManager;
     }
-    #[Route('/users', name: 'users', methods: ['GET'])]
+
+    #[Route('/usersinfo', name: 'usersinfo', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render("user/index.html.twig");

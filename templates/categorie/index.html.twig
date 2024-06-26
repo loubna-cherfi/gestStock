@@ -69,7 +69,7 @@
                                 </div>
                                 <input type="hidden" name="user" value="{{ app.user.id }}">
                                 <div class="modal-footer">
-                                    <button type="button" class="btn" data-bs-dismiss="modal" style="background-color:#ced4da;color:"#000000;">Fermer</button>
+                                    <button type="button" class="btn" data-bs-dismiss="modal" style="background-color:#ced4da;color:#000000;">Fermer</button>
                                     <button type="submit" class="btn" style="background-color:#6a994e;">Enregistrer</button>
                                 </div>
                             </form>
@@ -128,9 +128,9 @@
 
             $('#categorie-table').on('click', '.btn-edit', function () {
                 var categorieId = $(this).data('id');
-                axios.get('/categories/get/' + categorieId).then(function (response) {
+                axios.get('/admin/categories/get/' + categorieId).then(function (response) {
                     $('#edit-name').val(response.data.name);
-                    $('#edit-categorie-form').attr('action', '/categories/' + categorieId);
+                    $('#edit-categorie-form').attr('action', '/admin/categories/' + categorieId);
                     $('#modifiercategorie').modal('show');
                 }).catch(function (error) {
                     console.log(error);

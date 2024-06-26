@@ -133,14 +133,14 @@
 
         $('#user-table').on('click', '.btn-edit', function() {
             var userId = $(this).data('id');
-            axios.get('/users/get/' + userId)
+            axios.get('/admin/users/get/' + userId)
                 .then(function (response) {
                     $('#edit-username').val(response.data.username);
                     $('#edit-email').val(response.data.email);
                     $('#edit-mobile').val(response.data.mobile);
                     $('#edit-address').val(response.data.adress);
                     $('#edit-role').val(response.data.roles.includes('ROLE_ADMIN') ? 'ROLE_ADMIN' : 'ROLE_USER');
-                    $('#edit-user-form').attr('action', '/users/' + userId);
+                    $('#edit-user-form').attr('action', '/admin/users/' + userId);
                     $('#modifieruser').modal('show');
                 })
                 .catch(function (error) {
