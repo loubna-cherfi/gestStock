@@ -149,7 +149,7 @@
                     // You cannot pre-fill file input, show a placeholder or indication instead
                     $('#edit-image').val(''); // Clear the file input field
                     $('#current-image').text(response.data.image ? 'Image actuelle: ' + response.data.image : 'Pas d\'image actuelle');
-                    $('#img').attr('src','uploads/pictures/'+response.data.image);
+                    $('#img').attr('src','/uploads/pictures/'+response.data.image);
                     $('#edit-produit-form').attr('action', '/admin/produits/' + produitId);
                     $('#modifierproduit').modal('show');
                 }).catch(function (error) {

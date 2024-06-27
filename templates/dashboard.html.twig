@@ -2,15 +2,47 @@
 
 {% block title %}Votre Titre Ici{% endblock %}
 
-
 {% block body %}
+    <style>
+        /* Vos styles CSS pour l'animation et la mise en page */
+        .cute-animation {
+            animation: bounce 2s infinite;
+            transform-origin: center;
+        }
 
-  
-<script>
-    $(document).ready(function(){
-        
-    });
-</script>
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-30px);
+            }
+            60% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .main {
+            min-height: 600px;
+            margin: 0 auto;
+            width: auto;
+            max-width: 460px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+        }
+    </style>
+
+    <div class="main">
+        <img src="{{ asset('img/imgg.png') }}" alt="Cute Animation" class="cute-animation" width="400" height="400">
+        <h2>Bonjour dans G-STOCK</h2>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            // Votre code JavaScript ici si nécessaire
+        });
+    </script>
 {% endblock %}
-
-
