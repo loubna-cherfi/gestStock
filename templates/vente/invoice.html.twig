@@ -104,8 +104,8 @@
 						<div class="receipt-header row">
 							<div
 								class="col-xs-6 col-sm-6 col-md-6">{# <div class="receipt-left" style="margin-left: 5%">
-																		                            <img class="img-responsive" alt="" src="" style="width: 80px; border-radius: 43px;">
-																		                        </div> #}
+																																				                            <img class="img-responsive" alt="" src="" style="width: 80px; border-radius: 43px;">
+																																				                        </div> #}
 							</div>
 							<div class="col-xs-6 col-sm-6 col-md-6" style="margin-left: 70% ;margin-top: -70px">
 								<div class="receipt-right">
@@ -154,8 +154,9 @@
 							</div>
 							<div class="col-xs-4 col-sm-4 col-md-4" style="margin-left: 25%">
 								<div class="receipt-left">
-									<p><b>Facture</b>
-                                    {{ vente.id }}</p>
+									<p>
+										<b>Facture</b>
+										{{ vente.id }}</p>
 								</div>
 
 							</div>
@@ -168,49 +169,64 @@
 									<th>Produit</th>
 									<th>Prix unitaire</th>
 									<th>Quantité</th>
-                                    <th>Payment Method</th>
+									<th>Payment Method</th>
 									<th>Sous-total</th>
 
 								</tr>
 							</thead>
 							<tbody>
-								{% for item in produitsChoisis %}
-									<tr>
-										<td>{{ item.produit.name }}</td>
-										<td>{{ item.prix }}</td>
-										<td>{{ item.quantite }}</td>
-                                       <td> {{ paymentMethod }}</td>
-										<td>{{ item.subtotal }}</td>
-									</tr>
-								{% endfor %}
+
 								
-								 <tr>
-                    <td class="offset-4"></td>
-                        <td class="offset-4"></td>
-                        <td class="text-right"><h2><strong>Total: </strong></h2></td>
-                        <td class="text-left text-danger"><h2><strong><i class="fa fa-inr"></i>{{ total }} DH</strong></h2></td>
-                    </tr>
-                                {% if paymentMethod == 'cashe' %}
+		  {% for product in products %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.price }}</td>
+                    <td>{{ product.quantity }}</td>
+					 <td>{{ product.paymentMethod }}</td> 
+                    <td>{{ product.subtotal }}</td>
+                </tr>
+                {% endfor %}
+		
+
+								<tr>
+									<td class="offset-4"></td>
+									<td class="offset-4"></td>
+									<td class="text-right">
+										<h2>
+											<strong>Total:
+											</strong>
+										</h2>
+									</td>
+									<td class="text-left text-danger">
+										<h2>
+											<strong>
+												<i class="fa fa-inr"></i>
+												{{ total }}
+												DH</strong>
+										</h2>
+									</td>
+								</tr>
+								{% if paymentMethod == 'Espece' %}
 									<tr>
 										<td colspan="3" class="text-right">
-											<strong>Amount Paid:</strong>
+											<strong>Montant payé :</strong>
 										</td>
 										<td class="text-left text-success">
 											<strong>
 												<i class="fa fa-inr"></i>
 												{{ montantPaye }}
-												MAD</strong>
+												DH</strong>
 										</td>
 									</tr>
 									<tr>
 										<td colspan="3" class="text-right">
-											<strong>Remaining Balance:</strong>
+											<strong>Solde restant:</strong>
 										</td>
 										<td class="text-left text-warning">
 											<strong>
 												<i class="fa fa-inr"></i>
 												{{ total - montantPaye }}
-												MAD</strong>
+												DH</strong>
 										</td>
 									</tr>
 								{% endif %}
@@ -221,7 +237,7 @@
 						<div class="receipt-header receipt-header-mid receipt-footer">
 							<div class="col-xs-8 col-sm-8 col-md-8 text-left">
 								<div class="receipt-right">
-                                  
+
 									<p>
 										<b>Date :</b>
 										{{ vente.dateVente|date('Y-m-d') }}</p>
